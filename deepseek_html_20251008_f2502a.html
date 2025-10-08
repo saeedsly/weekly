@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه هفتگی آموزشی - شهرداری مشهد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* تمام استایل‌های CSS شما بدون تغییر در اینجا قرار می‌گیرد */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        :root { --primary: #2E86AB; --secondary: #A23B72; --success: #1B998B; --info: #F46036; --warning: #F9C80E; --light: #f8f9fa; --dark: #212529; --text: #333; --border: #dee2e6; --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); --transition: all 0.3s ease; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: var(--text); min-height: 100vh; padding: 20px; line-height: 1.6; display: flex; flex-direction: column; }
+        .container { max-width: 1400px; margin: 0 auto; flex: 1; }
+        header { text-align: center; margin-bottom: 30px; padding: 20px; background: white; border-radius: 12px; box-shadow: var(--shadow); background: linear-gradient(135deg, #2E86AB 0%, #1B998B 100%); color: white; }
+        h1 { margin-bottom: 10px; font-weight: 700; font-size: 2.2rem; }
+        .subtitle { font-size: 1.1rem; opacity: 0.9; }
+        .form-section { background: white; padding: 25px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 30px; }
+        .schedule-section { background: white; padding: 25px; border-radius: 12px; box-shadow: var(--shadow); overflow-x: auto; margin-bottom: 30px; }
+        .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .section-title i { font-size: 1.5rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--secondary); }
+        input, select, textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; transition: var(--transition); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2); }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .checkbox-item { display: flex; align-items: center; gap: 5px; background: var(--light); padding: 8px 12px; border-radius: 6px; }
+        .checkbox-item input { width: auto; }
+        .buttons { display: flex; gap: 10px; margin-top: 25px; flex-wrap: wrap; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; flex: 1; min-width: 120px; justify-content: center; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1B6B93; transform: translateY(-2px); }
+        .btn-secondary { background: var(--light); color: var(--dark); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #e9ecef; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #148277; }
+        .btn-warning { background: var(--warning); color: var(--dark); }
+        .btn-warning:hover { background: #e6b400; }
+        .course-item { color: white; padding: 10px; border-radius: 6px; margin-bottom: 5px; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: var(--transition); cursor: pointer; position: relative; border: 1px solid rgba(255,255,255,0.2); height: 100%; }
+        .course-item:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .course-item.dragging { opacity: 0.5; transform: rotate(5deg); }
+        .course-title { font-weight: 600; margin-bottom: 5px; }
+        .course-details { font-size: 0.8rem; opacity: 0.9; }
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--primary); }
+        .search-box input { padding-left: 40px; }
+        .course-list { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 10px; background: white; display: none; z-index: 1000; position: relative; }
+        .course-option { padding: 10px 12px; cursor: pointer; border-radius: 6px; transition: var(--transition); border-bottom: 1px solid #f0f0f0; }
+        .course-option:hover { background: var(--light); }
+        .course-code { font-size: 0.8rem; color: var(--primary); font-weight: bold; }
+        .course-duration { font-size: 0.8rem; color: var(--success); margin: 3px 0; }
+        .course-dates { font-size: 0.75rem; color: var(--secondary); }
+        .hidden { display: none; }
+        .print-only { display: none; }
+        @media print { @page { size: A4 landscape; margin: 0.5cm; } body { background: white !important; padding: 0 !important; } body * { visibility: hidden; } .schedule-section, .schedule-section * { visibility: visible; } .schedule-section { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; padding: 10px; page-break-after: always; page-break-inside: avoid; break-inside: avoid; margin: 0 !important; } .no-print { display: none !important; } .print-only { display: block; text-align: center; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; } .footer { display: none; } .course-item { break-inside: avoid; page-break-inside: avoid; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; font-size: 0.7rem; padding: 5px; } .schedule-table { width: 100%; transform: scale(0.95); transform-origin: top right; } .hospitality-info { display: block !important; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 8px; border: 1px solid #dee2e6; font-size: 0.8rem; } .schedule-cell { min-height: 90px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; padding: 5px; } .day-header, .location-header { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; padding: 10px 5px; font-size: 0.9rem; } .day-name { font-size: 0.9rem; } .day-date { font-size: 0.7rem; } .week-title { display: block !important; text-align: center; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold; background: #f0f0f0; padding: 8px; border-radius: 4px; border: 1px solid #ccc; } }
+        .notification { position: fixed; bottom: 80px; right: 20px; padding: 15px 25px; background: var(--success); color: white; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: var(--transition); z-index: 1000; max-width: 400px; }
+        .notification.error { background: #dc3545; }
+        .notification.warning { background: var(--warning); color: var(--dark); }
+        .notification.show { transform: translateY(0); opacity: 1; }
+        .date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .course-category { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; margin-top: 3px; display: inline-block; }
+        .empty-cell { min-height: 80px; background: #f8f9fa; border-radius: 4px; border: 1px dashed #dee2e6; }
+        .legend { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid var(--border); }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
+        .legend-text { font-size: 0.9rem; }
+        .schedule-table { display: grid; grid-template-columns: 120px repeat(8, 1fr); gap: 2px; margin-top: 20px; border: 2px solid var(--primary); border-radius: 8px; overflow: hidden; background-color: var(--border); }
+        .day-header { background: var(--primary); color: white; padding: 15px 10px; text-align: center; font-weight: bold; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: center; }
+        .day-name { font-size: 1.1rem; font-weight: bold; }
+        .day-date { font-size: 0.8rem; opacity: 0.9; margin-top: 5px; }
+        .location-header { background: var(--secondary); color: white; padding: 15px 10px; text-align: center; font-weight: bold; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.2); }
+        .schedule-cell { min-height: 120px; background: #f8f9fa; padding: 8px; display: flex; flex-direction: column; gap: 5px; border: 1px solid var(--border); transition: all 0.3s ease; position: relative; }
+        .schedule-cell:not(.empty) { background: linear-gradient(135deg, #f8f9fa, #e9ecef); }
+        .schedule-cell.drag-over { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px dashed var(--primary); }
+        .schedule-cell.empty { background: #f8f9fa; }
+        .delete-course { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.3); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; opacity: 0; transition: var(--transition); }
+        .edit-course { position: absolute; top: 5px; left: 30px; background: rgba(0,0,0,0.3); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; opacity: 0; transition: var(--transition); }
+        .course-item:hover .delete-course, .course-item:hover .edit-course { opacity: 1; }
+        .course-info { font-size: 0.75rem; margin-top: 3px; }
+        .exam-badge { position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; border: 1px solid white; }
+        .exam-checkbox { margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 6px; border: 1px solid #ffeaa7; }
+        .footer { text-align: center; padding: 15px; margin-top: 30px; background: white; border-radius: 8px; box-shadow: var(--shadow); border-top: 2px solid var(--primary); }
+        .footer-content { color: var(--text); font-size: 0.8rem; }
+        .footer-content p { margin: 3px 0; }
+        .copyright { color: var(--primary); font-weight: 500; }
+        .developer { color: var(--info); font-style: normal; }
+        .additional-buttons { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .stats { background: var(--light); padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--border); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 10px; }
+        .stat-item { text-align: center; padding: 10px; background: white; border-radius: 6px; border: 1px solid var(--border); }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text); margin-top: 5px; }
+        .hospitality-section { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid var(--border); }
+        .hospitality-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hospitality-info { display: none; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #dee2e6; font-size: 0.9rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background-color: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .modal-title { font-size: 1.5rem; color: var(--primary); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--secondary); }
+        .hospitality-cell { min-height: 120px; background: #f8f9fa; padding: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; }
+        .hospitality-item { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); padding: 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #a5d6a7; }
+        .hospitality-details { font-size: 0.75rem; margin-top: 3px; opacity: 0.9; }
+        .week-dates-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .holiday { background: linear-gradient(135deg, #ffcccc, #ff9999) !important; color: #990000; }
+        .holiday .day-name { color: #990000; }
+        .hospitality-badge { background: linear-gradient(135deg, #4caf50, #2e7d32); color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; margin-top: 5px; display: inline-block; }
+        @media (max-width: 1200px) { .schedule-table { grid-template-columns: 100px repeat(8, 1fr); } }
+        @media (max-width: 992px) { .schedule-table { grid-template-columns: 80px repeat(8, 1fr); } .day-header, .location-header { font-size: 0.9rem; padding: 10px 5px; } }
+        @media (max-width: 768px) { .schedule-table { display: block; overflow-x: auto; white-space: nowrap; } .schedule-table > * { display: inline-block; vertical-align: top; width: 150px; } .schedule-table > :first-child { width: 100px; } .week-dates-inputs { grid-template-columns: 1fr; } }
+        .week-title { display: none; text-align: center; margin-bottom: 10px; font-size: 1.3rem; font-weight: bold; background: #f0f0f0; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+        .week-navigation { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px; background: var(--light); border-radius: 8px; }
+        .week-nav-btn { background: var(--primary); color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .current-week-display { font-weight: bold; font-size: 1.1rem; }
+    </style>
+    <!-- START: افزودن کتابخانه‌های Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- END: افزودن کتابخانه‌های Firebase -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>برنامه هفتگی موسسه آموزش شهرداری ها</h1>
+            <p class="subtitle">دوره های آموزشی تخصصی شهرداری مشهد</p>
+        </header>
+        
+        <!-- تمام کدهای HTML شما بدون تغییر در اینجا قرار می‌گیرد -->
+        <section class="form-section no-print">
+            <h2 class="section-title"><i class="fas fa-plus-circle"></i> افزودن کلاس جدید</h2>
+            <div class="week-dates-inputs">
+                <div class="form-group"><label for="weekStartDate">تاریخ شروع هفته:</label><input type="text" id="weekStartDate" placeholder="مثال: 1404/07/01"></div>
+                <div class="form-group"><label for="weekEndDate">تاریخ پایان هفته:</label><input type="text" id="weekEndDate" placeholder="مثال: 1404/07/07"></div>
+            </div>
+            <div class="form-group">
+                <label for="courseSearch">جستجوی نام دوره (کد، عنوان، تاریخ یا مدت):</label>
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="courseSearch" placeholder="جستجو بر اساس کد، عنوان، تاریخ یا مدت دوره..."></div>
+                <div class="form-group"><label for="categoryFilter">فیلتر بر اساس دسته‌بندی:</label><select id="categoryFilter"><option value="">همه دسته‌بندی‌ها</option><option value="تعاملات اداری و پیگیری‌ها">تعاملات اداری</option><option value="بازرسی">بازرسی</option><option value="مدیریت منابع انسانی">مدیریت منابع انسانی</option><option value="مطالعات و پژوهش">مطالعات و پژوهش</option><option value="بودجه و کنترل پروژه">بودجه و کنترل پروژه</option><option value="تاسیسات و برق">تاسیسات و برق</option><option value="حمل و نقل عمومی">حمل و نقل عمومی</option><option value="خدمات شهری و پسماند">خدمات شهری و پسماند</option><option value="فضای سبز و محیط زیست">فضای سبز و محیط زیست</option><option value="معماری و شهرسازی">معماری و شهرسازی</option><option value="مدیریت و برنامه‌ریزی">مدیریت و برنامه‌ریزی</option><option value="مدیریت ارتباطات و رسانه">مدیریت ارتباطات و رسانه</option><option value="فرهنگی و اجتماعی">فرهنگی و اجتماعی</option><option value="گزینش">گزینش</option><option value="حقوقی">حقوقی</option><option value="عمران و نگهداری تاسیسات شهری">عمران و نگهداری</option><option value="شورای شهر">شورای شهر</option></select></div>
+                <div class="course-list" id="courseList"></div>
+            </div>
+            <div class="form-group"><label for="courseCode">کد کلاس:</label><input type="text" id="courseCode" placeholder="کد کلاس" readonly></div>
+            <div class="form-group"><label for="courseName">عنوان کلاس:</label><input type="text" id="courseName" placeholder="عنوان کلاس"></div>
+            <div class="form-group"><label for="courseMethod">روش آموزش:</label><input type="text" id="courseMethod" placeholder="روش آموزش" readonly></div>
+            <div class="form-group"><label for="courseDuration">مدت دوره (ساعت):</label><input type="text" id="courseDuration" placeholder="مدت دوره" readonly></div>
+            <div class="form-group"><label for="instructorName">نام استاد:</label><input type="text" id="instructorName" placeholder="نام استاد را وارد کنید"></div>
+            <div class="form-group"><label for="classroom">محل برگزاری:</label><select id="classroom"><option value="201">کلاس ۲۰۱</option><option value="202">کلاس ۲۰۲</option><option value="203">کلاس ۲۰۳</option><option value="talar-khayyam">تالار خیام</option><option value="seminar-hafez">سمینار حافظ</option><option value="hospitality">پذیرایی</option><option value="exam">آزمون</option><option value="outside">کلاس خارج از موسسه</option></select></div>
+            <div class="form-group"><label>روزهای برگزاری:</label><div class="checkbox-group"><div class="checkbox-item"><input type="checkbox" id="saturday" value="شنبه"><label for="saturday">شنبه</label></div><div class="checkbox-item"><input type="checkbox" id="sunday" value="یکشنبه"><label for="sunday">یکشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="monday" value="دوشنبه"><label for="monday">دوشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="tuesday" value="سه‌شنبه"><label for="tuesday">سه‌شنبه</label></div><div class="checkbox-item"><input type="checkbox" id="wednesday" value="چهارشنبه"><label for="wednesday">چهارشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="thursday" value="پنجشنبه"><label for="thursday">پنجشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="friday" value="جمعه"><label for="friday">جمعه</label></div></div></div>
+            <div class="form-group"><label>تاریخ‌های دوره:</label><div class="date-inputs"><div><label for="startDate">تاریخ شروع:</label><input type="text" id="startDate" placeholder="تاریخ شروع"></div><div><label for="endDate">تاریخ پایان:</label><input type="text" id="endDate" placeholder="تاریخ پایان"></div></div></div>
+            <div class="form-group exam-checkbox"><div class="checkbox-item"><input type="checkbox" id="isExam"><label for="isExam">آزمون دوره</label></div></div>
+            <div class="hospitality-section"><h3 class="section-title"><i class="fas fa-utensils"></i> اطلاعات پذیرایی</h3><div class="hospitality-inputs"><div class="form-group"><label for="hospitalityType">نوع پذیرایی:</label><input type="text" id="hospitalityType" placeholder="نوع پذیرایی را بنویسید"></div><div class="form-group"><label for="hospitalityCount">تعداد پذیرایی:</label><input type="number" id="hospitalityCount" placeholder="تعداد" min="1"></div></div></div>
+            <div class="buttons"><button class="btn-primary" id="addCourse"><i class="fas fa-plus"></i> افزودن به برنامه</button><button class="btn-success" id="printSchedule"><i class="fas fa-print"></i> پرینت برنامه</button><button class="btn-secondary" id="resetForm"><i class="fas fa-redo"></i> بازنشانی</button></div>
+            <div class="additional-buttons"><button class="btn-warning" id="clearSchedule"><i class="fas fa-trash"></i> پاک کردن تمام برنامه</button><button class="btn-secondary" id="saveSchedule"><i class="fas fa-save"></i> ذخیره برنامه</button><button class="btn-success" id="exportToSheets"><i class="fas fa-file-excel"></i> ذخیره در گوگل شیت</button></div>
+            <div class="stats"><h3 class="section-title"><i class="fas fa-chart-bar"></i> آمار برنامه</h3><div class="stats-grid"><div class="stat-item"><div class="stat-value" id="totalCourses">0</div><div class="stat-label">کل کلاس‌ها</div></div><div class="stat-item"><div class="stat-value" id="totalHours">0</div><div class="stat-label">ساعت آموزشی</div></div><div class="stat-item"><div class="stat-value" id="examCount">0</div><div class="stat-label">آزمون‌ها</div></div><div class="stat-item"><div class="stat-value" id="busyDays">0</div><div class="stat-label">روزهای پر</div></div></div></div>
+            <div class="legend"><div class="legend-item"><div class="legend-color" style="background: #2E86AB;"></div><div class="legend-text">تعاملات اداری و پیگیری‌ها</div></div><div class="legend-item"><div class="legend-color" style="background: #A23B72;"></div><div class="legend-text">بازرسی</div></div><div class="legend-item"><div class="legend-color" style="background: #1B998B;"></div><div class="legend-text">بودجه و کنترل پروژه</div></div><div class="legend-item"><div class="legend-color" style="background: #F46036;"></div><div class="legend-text">تاسیسات و برق</div></div><div class="legend-item"><div class="legend-color" style="background: #F9C80E;"></div><div class="legend-text">حقوقی</div></div><div class="legend-item"><div class="legend-color" style="background: #5B6C5D;"></div><div class="legend-text">حمل و نقل عمومی</div></div><div class="legend-item"><div class="legend-color" style="background: #3D5A80;"></div><div class="legend-text">خدمات شهری و پسماند</div></div><div class="legend-item"><div class="legend-color" style="background: #EE6C4D;"></div><div class="legend-text">شورای شهر</div></div><div class="legend-item"><div class="legend-color" style="background: #293241;"></div><div class="legend-text">عمران و نگهداری</div></div><div class="legend-item"><div class="legend-color" style="background: #A63A50;"></div><div class="legend-text">فرهنگی و اجتماعی</div></div><div class="legend-item"><div class="legend-color" style="background: #6A994E;"></div><div class="legend-text">فضای سبز و محیط زیست</div></div><div class="legend-item"><div class="legend-color" style="background: #BC4749;"></div><div class="legend-text">گزینش</div></div><div class="legend-item"><div class="legend-color" style="background: #6D6875;"></div><div class="legend-text">مدیریت و برنامه‌ریزی</div></div><div class="legend-item"><div class="legend-color" style="background: #0077B6;"></div><div class="legend-text">مدیریت ارتباطات و رسانه</div></div><div class="legend-item"><div class="legend-color" style="background: #00B4D8;"></div><div class="legend-text">مدیریت منابع انسانی</div></div><div class="legend-item"><div class="legend-color" style="background: #7209B7;"></div><div class="legend-text">مطالعات و پژوهش</div></div><div class="legend-item"><div class="legend-color" style="background: #F3722C;"></div><div class="legend-text">معماری و شهرسازی</div></div><div class="legend-item"><div class="legend-color" style="background: #dc3545;"></div><div class="legend-text">آزمون</div></div></div>
+        </section>
+        <section class="schedule-section">
+            <h2 class="section-title"><i class="fas fa-calendar-alt"></i> برنامه هفتگی</h2>
+            <div class="print-only">برنامه هفتگی موسسه آموزش شهرداری ها - دوره های آموزشی تخصصی شهرداری مشهد</div>
+            <div class="week-navigation no-print"><button class="week-nav-btn" id="prevWeek"><i class="fas fa-chevron-right"></i> هفته قبل</button><div class="current-week-display" id="currentWeekDisplay">هفته اول مهر ۱۴۰۴</div><button class="week-nav-btn" id="nextWeek">هفته بعد <i class="fas fa-chevron-left"></i></button></div>
+            <div class="week-title" id="weekTitle">هفته اول مهر ۱۴۰۴</div>
+            <div class="schedule-table" id="scheduleTable"><div class="day-header">روز / مکان</div><div class="location-header">کلاس ۲۰۱</div><div class="location-header">کلاس ۲۰۲</div><div class="location-header">کلاس ۲۰۳</div><div class="location-header">تالار خیام</div><div class="location-header">سمینار حافظ</div><div class="location-header">پذیرایی</div><div class="location-header">آزمون</div><div class="location-header">خارج از موسسه</div></div>
+        </section>
+    </div>
+    <div class="modal" id="editModal">
+        <div class="modal-content"><div class="modal-header"><h3 class="modal-title">ویرایش کلاس</h3><button class="close-modal">&times;</button></div><div class="form-group"><label for="editCourseName">عنوان کلاس:</label><input type="text" id="editCourseName"></div><div class="form-group"><label for="editInstructorName">نام استاد:</label><input type="text" id="editInstructorName"></div><div class="form-group"><label for="editClassroom">محل برگزاری:</label><select id="editClassroom"><option value="201">کلاس ۲۰۱</option><option value="202">کلاس ۲۰۲</option><option value="203">کلاس ۲۰۳</option><option value="talar-khayyam">تالار خیام</option><option value="seminar-hafez">سمینار حافظ</option><option value="hospitality">پذیرایی</option><option value="exam">آزمون</option><option value="outside">کلاس خارج از موسسه</option></select></div><div class="form-group"><label>روزهای برگزاری:</label><div class="checkbox-group"><div class="checkbox-item"><input type="checkbox" id="editSaturday" value="شنبه"><label for="editSaturday">شنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editSunday" value="یکشنبه"><label for="editSunday">یکشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editMonday" value="دوشنبه"><label for="editMonday">دوشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editTuesday" value="سه‌شنبه"><label for="editTuesday">سه‌شنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editWednesday" value="چهارشنبه"><label for="editWednesday">چهارشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editThursday" value="پنجشنبه"><label for="editThursday">پنجشنبه</label></div><div class="checkbox-item"><input type="checkbox" id="editFriday" value="جمعه"><label for="editFriday">جمعه</label></div></div></div><div class="form-group"><label>تاریخ‌های دوره:</label><div class="date-inputs"><div><label for="editStartDate">تاریخ شروع:</label><input type="text" id="editStartDate"></div><div><label for="editEndDate">تاریخ پایان:</label><input type="text" id="editEndDate"></div></div></div><div class="form-group exam-checkbox"><div class="checkbox-item"><input type="checkbox" id="editIsExam"><label for="editIsExam">آزمون دوره</label></div></div><div class="hospitality-section"><h3 class="section-title"><i class="fas fa-utensils"></i> اطلاعات پذیرایی</h3><div class="hospitality-inputs"><div class="form-group"><label for="editHospitalityType">نوع پذیرایی:</label><input type="text" id="editHospitalityType" placeholder="نوع پذیرایی را بنویسید"></div><div class="form-group"><label for="editHospitalityCount">تعداد پذیرایی:</label><input type="number" id="editHospitalityCount" placeholder="تعداد" min="1"></div></div></div><div class="buttons"><button class="btn-primary" id="saveEdit"><i class="fas fa-save"></i> ذخیره تغییرات</button><button class="btn-secondary" id="cancelEdit"><i class="fas fa-times"></i> انصراف</button></div></div>
+    </div>
+    <footer class="footer no-print"><div class="footer-content"><p class="copyright">حق معنوی این کد به شرکت پیشگامان شرق طوس می‌باشد</p><p class="developer">طراحی و توسعه: سعید سالاری</p></div></footer>
+    <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span id="notificationText">کلاس با موفقیت اضافه شد!</span></div>
+
+    <script>
+        // =========================================================================================
+        // START: Firebase Configuration (مرحله 3: این قسمت را با اطلاعات خود جایگزین کنید)
+        // =========================================================================================
+        const firebaseConfig = {
+  apiKey: "AIzaSyCMJwnrLixlpqa9td7XKstBr5ppje52iUo",
+  authDomain: "mashhad-schedule.firebaseapp.com",
+  projectId: "mashhad-schedule",
+  storageBucket: "mashhad-schedule.firebasestorage.app",
+  messagingSenderId: "793466528755",
+  appId: "1:793466528755:web:a32ec3517d910c0b036886"
+        };
+        // =========================================================================================
+        // END: Firebase Configuration
+        // =========================================================================================
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const scheduleRef = database.ref('schedule/courses');
+
+        const defaultCourses = [ {code: "10008224677001", name: "مدیریت زمان و اولویت‌بندی وظایف با ماتریس آیزنهاور و ابزارهای دیجیتال", method: "حضوري ، آزمون مجازي", duration: "12", startDate: "1404/05/04", endDate: "1404/05/08", category: "تعاملات اداری و پیگیری‌ها"}, {code: "100082014678001", name: "آشنایی با ساختار و تشکیلات شهرداری ها (شناخت مجموعه های شهرداری و سلسله مراتب های اداری و ...)", method: "حضوري ، آزمون مجازي", duration: "12", startDate: "1404/05/15", endDate: "1404/05/20", category: "تعاملات اداری و پیگیری‌ها"}, {code: "100082014678002", name: "اصول و فنون مذاکره و ارتباط موثر در محیط اداری", method: "حضوري ، آزمون مجازي", duration: "16", startDate: "1404/06/01", endDate: "1404/06/05", category: "تعاملات اداری و پیگیری‌ها"}, {code: "100082014678003", name: "آیین نامه مالی و معاملاتی شهرداری ها", method: "حضوري ، آزمون مجازي", duration: "20", startDate: "1404/06/10", endDate: "1404/06/15", category: "تعاملات اداری و پیگیری‌ها"}, {code: "100082014678004", name: "اصول نگارش مکاتبات اداری و گزارش نویسی", method: "حضوري ، آزمون مجازي", duration: "12", startDate: "1404/06/20", endDate: "1404/06/24", category: "تعاملات اداری و پیگیری‌ها"}, {code: "100082014678005", name: "اصول و روش های بازرسی در شهرداری ها", method: "حضوري ، آزمون مجازي", duration: "16", startDate: "1404/07/01", endDate: "1404/07/05", category: "بازرسی"}, {code: "100082014678006", name: "بازرسی فنی از پروژه های عمرانی", method: "حضوري ، آزمون مجازي", duration: "20", startDate: "1404/07/10", endDate: "1404/07/15", category: "بازرسی"}, {code: "100082014678007", name: "اصول بودجه ریزی و کنترل بودجه در شهرداری", method: "حضوري ، آزمون مجازي", duration: "16", startDate: "1404/08/01", endDate: "1404/08/05", category: "بودجه و کنترل پروژه"}, {code: "100082014678008", name: "مدیریت و کنترل پروژه های عمرانی", method: "حضوري ، آزمون مجازي", duration: "24", startDate: "1404/08/10", endDate: "1404/08/17", category: "بودجه و کنترل پروژه"}, {code: "100082014678009", name: "اصول فنی تاسیسات برق شهری", method: "حضوري ، آزمون مجازي", duration: "20", startDate: "1404/09/01", endDate: "1404/09/06", category: "تاسیسات و برق"}, {code: "100082014678010", name: "قانون شهرداری ها و آیین نامه های مربوطه", method: "حضوري ، آزمون مجازي", duration: "16", startDate: "1404/10/01", endDate: "1404/10/05", category: "حقوقی"}, {code: "100082014678011", name: "مدیریت حمل و نقل عمومی و ترافیک شهری", method: "حضوري ، آزمون مجازي", duration: "18", startDate: "1404/11/01", endDate: "1404/11/06", category: "حمل و نقل عمومی"}, {code: "100082014678012", name: "مدیریت پسماند و بازیافت در شهر", method: "حضوري ، آزمون مجازي", duration: "16", startDate: "1404/12/01", endDate: "1404/12/05", category: "خدمات شهری و پسماند"}, {code: "100082014678013", name: "مدیریت فضای سبز و محیط زیست شهری", method: "حضوري ، آزمون مجازي", duration: "18", startDate: "1404/01/01", endDate: "1404/01/06", category: "فضای سبز و محیط زیست"}, {code: "100082014678014", name: "اصول شهرسازی و طراحی شهری", method: "حضوري ، آزمون مجازي", duration: "20", startDate: "1404/02/01", endDate: "1404/02/06", category: "معماری و شهرسازی"}, {code: "100082014678015", name: "آزمون پایانی دوره مدیریت شهری", method: "حضوري", duration: "2", startDate: "1404/03/01", endDate: "1404/03/01", category: "آزمون"} ];
+        const categoryColors = { "تعاملات اداری و پیگیری‌ها": "#2E86AB", "بازرسی": "#A23B72", "بودجه و کنترل پروژه": "#1B998B", "تاسیسات و برق": "#F46036", "حقوقی": "#F9C80E", "حمل و نقل عمومی": "#5B6C5D", "خدمات شهری و پسماند": "#3D5A80", "شورای شهر": "#EE6C4D", "عمران و نگهداری تاسیسات شهری": "#293241", "فرهنگی و اجتماعی": "#A63A50", "فضای سبز و محیط زیست": "#6A994E", "گزینش": "#BC4749", "مدیریت و برنامه‌ریزی": "#6D6875", "مدیریت ارتباطات و رسانه": "#0077B6", "مدیریت منابع انسانی": "#00B4D8", "مطالعات و پژوهش": "#7209B7", "معماری و شهرسازی": "#F3722C", "آزمون": "#dc3545" };
+        const holidays = [ "1404/01/01", "1404/01/02", "1404/01/03", "1404/01/04", "1404/01/11", "1404/01/12", "1404/01/13", "1404/03/14", "1404/03/15", "1404/03/16", "1404/03/24", "1404/04/14", "1404/04/15", "1404/05/23", "1404/05/31", "1404/06/02", "1404/06/10", "1404/06/19", "1404/09/03", "1404/10/13", "1404/10/27", "1404/11/15", "1404/11/22", "1404/12/20", "1404/12/29"];
+        const courseSearch = document.getElementById('courseSearch'), courseList = document.getElementById('courseList'), courseCode = document.getElementById('courseCode'), courseName = document.getElementById('courseName'), courseMethod = document.getElementById('courseMethod'), courseDuration = document.getElementById('courseDuration'), instructorName = document.getElementById('instructorName'), startDateInput = document.getElementById('startDate'), endDateInput = document.getElementById('endDate'), isExam = document.getElementById('isExam'), categoryFilter = document.getElementById('categoryFilter'), addCourseBtn = document.getElementById('addCourse'), printScheduleBtn = document.getElementById('printSchedule'), resetFormBtn = document.getElementById('resetForm'), clearScheduleBtn = document.getElementById('clearSchedule'), saveScheduleBtn = document.getElementById('saveSchedule'), exportToSheetsBtn = document.getElementById('exportToSheets'), notification = document.getElementById('notification'), notificationText = document.getElementById('notificationText'), weekStartDate = document.getElementById('weekStartDate'), weekEndDate = document.getElementById('weekEndDate'), scheduleTable = document.getElementById('scheduleTable'), weekTitle = document.getElementById('weekTitle'), currentWeekDisplay = document.getElementById('currentWeekDisplay'), prevWeekBtn = document.getElementById('prevWeek'), nextWeekBtn = document.getElementById('nextWeek'), hospitalityType = document.getElementById('hospitalityType'), hospitalityCount = document.getElementById('hospitalityCount'), editModal = document.getElementById('editModal'), editCourseName = document.getElementById('editCourseName'), editInstructorName = document.getElementById('editInstructorName'), editClassroom = document.getElementById('editClassroom'), editStartDate = document.getElementById('editStartDate'), editEndDate = document.getElementById('editEndDate'), editIsExam = document.getElementById('editIsExam'), editHospitalityType = document.getElementById('editHospitalityType'), editHospitalityCount = document.getElementById('editHospitalityCount'), saveEditBtn = document.getElementById('saveEdit'), cancelEditBtn = document.getElementById('cancelEdit'), closeModalBtn = document.querySelector('.close-modal'), totalCoursesEl = document.getElementById('totalCourses'), totalHoursEl = document.getElementById('totalHours'), examCountEl = document.getElementById('examCount'), busyDaysEl = document.getElementById('busyDays');
+        
+        let allCourses = [];
+        let currentEditingCourse = null;
+        let currentWeekDates = {};
+
+        // *** NEW: Listen for real-time data changes from Firebase ***
+        scheduleRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            allCourses = data ? Object.values(data) : []; // Firebase returns an object, we need an array
+            console.log("Data loaded from Firebase.");
+            updateStats();
+            updateScheduleTable();
+        });
+
+        // *** MODIFIED: Save function now writes to Firebase ***
+        async function saveToFirebase() {
+            try {
+                // Convert array to object with IDs as keys for Firebase
+                const dataToSave = allCourses.reduce((obj, course) => {
+                    obj[course.id] = course;
+                    return obj;
+                }, {});
+                await scheduleRef.set(dataToSave);
+                showNotification('برنامه با موفقیت در سرور ذخیره شد!');
+            } catch (error) {
+                console.error("Error saving data to Firebase: ", error);
+                showNotification('خطا در ذخیره‌سازی اطلاعات!', 'error');
+            }
+        }
+        
+        addCourseBtn.addEventListener('click', async () => {
+            const code = courseCode.value.trim(); const name = courseName.value.trim(); const instructor = instructorName.value.trim(); const classroom = document.getElementById('classroom').value; const startDateVal = startDateInput.value.trim(); const endDateVal = endDateInput.value.trim(); const exam = isExam.checked; const hospitalityTypeVal = hospitalityType.value.trim(); const hospitalityCountVal = hospitalityCount.value.trim(); const days = []; const dayCheckboxes = [document.getElementById('saturday'), document.getElementById('sunday'), document.getElementById('monday'), document.getElementById('tuesday'), document.getElementById('wednesday'), document.getElementById('thursday'), document.getElementById('friday')];
+            dayCheckboxes.forEach(checkbox => { if (checkbox.checked) { days.push(checkbox.value); } });
+            if (!name) { showNotification('لطفاً نام کلاس را وارد کنید.', 'error'); courseName.focus(); return; }
+            if (days.length === 0) { showNotification('لطفاً حداقل یک روز برگزاری انتخاب کنید.', 'error'); return; }
+            if (!instructor) { showNotification('لطفاً نام استاد را وارد کنید.', 'error'); instructorName.focus(); return; }
+            let courseCategory = defaultCourses.find(c => c.code === code)?.category || 'عمومی'; if (exam) { courseCategory = "آزمون"; } const courseColor = categoryColors[courseCategory] || '#6c757d';
+            const courseId = Date.now().toString();
+            
+            allCourses.push({ id: courseId, code, name, instructor, classroom, days, startDate: startDateVal, endDate: endDateVal, color: courseColor, category: courseCategory, exam: exam, hospitalityType: hospitalityTypeVal, hospitalityCount: hospitalityCountVal });
+            
+            await saveToFirebase();
+            showNotification('کلاس با موفقیت به برنامه اضافه شد!');
+            resetForm();
+        });
+
+        function addClassToSchedule(id, code, name, instructor, classroom, days, startDate, endDate, color, category, isExam, hospitalityType, hospitalityCount) {
+            days.forEach(day => {
+                const date = currentWeekDates[day];
+                if (!date || date < startDate || date > endDate) return;
+                let targetClassroom = classroom; if (isExam) { targetClassroom = 'exam'; }
+                const cellId = `cell-${getDayId(day)}-${targetClassroom}`; const cell = document.getElementById(cellId);
+                if (cell) {
+                    const courseItem = document.createElement('div');
+                    courseItem.className = 'course-item'; courseItem.style.background = `linear-gradient(135deg, ${color}, ${adjustColor(color, -20)})`; courseItem.setAttribute('data-course-id', id); courseItem.setAttribute('draggable', 'true');
+                    let examBadge = ''; if (isExam) { examBadge = '<div class="exam-badge">آزمون</div>'; }
+                    let hospitalityBadge = ''; if (hospitalityType && hospitalityCount) { hospitalityBadge = `<div class="hospitality-badge">${hospitalityType} - ${hospitalityCount} نفر</div>`; }
+                    courseItem.innerHTML = `<button class="delete-course" title="حذف کلاس">×</button><button class="edit-course" title="ویرایش کلاس"><i class="fas fa-edit"></i></button>${examBadge}<div class="course-title">${name}</div><div class="course-details">${instructor ? `استاد: ${instructor}` : ''}</div><div class="course-info">${targetClassroom}</div>${hospitalityBadge}`;
+                    courseItem.querySelector('.delete-course').addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm('آیا از حذف این کلاس اطمینان دارید؟')) {
+                            allCourses = allCourses.filter(course => course.id !== id);
+                            await saveToFirebase();
+                            showNotification('کلاس با موفقیت حذف شد!');
+                        }
+                    });
+                    courseItem.querySelector('.edit-course').addEventListener('click', (e) => { e.stopPropagation(); const course = allCourses.find(c => c.id === id); if (course) { openEditModal(course); } });
+                    cell.appendChild(courseItem); cell.className = 'schedule-cell';
+                    initializeDragAndDropForItem(courseItem);
+                }
+            });
+        }
+
+        saveEditBtn.addEventListener('click', async () => {
+            if (!currentEditingCourse) return;
+            const updatedName = editCourseName.value.trim(); const updatedInstructor = editInstructorName.value.trim(); const updatedClassroom = editClassroom.value; const updatedStartDate = editStartDate.value.trim(); const updatedEndDate = editEndDate.value.trim(); const updatedIsExam = editIsExam.checked; const updatedHospitalityType = editHospitalityType.value.trim(); const updatedHospitalityCount = editHospitalityCount.value.trim();
+            const updatedDays = []; const dayCheckboxes = { 'شنبه': document.getElementById('editSaturday'), 'یکشنبه': document.getElementById('editSunday'), 'دوشنبه': document.getElementById('editMonday'), 'سه‌شنبه': document.getElementById('editTuesday'), 'چهارشنبه': document.getElementById('editWednesday'), 'پنجشنبه': document.getElementById('editThursday'), 'جمعه': document.getElementById('editFriday') };
+            for (const [day, checkbox] of Object.entries(dayCheckboxes)) { if (checkbox.checked) { updatedDays.push(day); } }
+            if (!updatedName) { showNotification('لطفاً نام کلاس را وارد کنید.', 'error'); editCourseName.focus(); return; }
+            if (updatedDays.length === 0) { showNotification('لطفاً حداقل یک روز برگزاری انتخاب کنید.', 'error'); return; }
+            if (!updatedInstructor) { showNotification('لطفاً نام استاد را وارد کنید.', 'error'); editInstructorName.focus(); return; }
+            const courseIndex = allCourses.findIndex(course => course.id === currentEditingCourse.id);
+            if (courseIndex !== -1) { allCourses[courseIndex] = { ...allCourses[courseIndex], name: updatedName, instructor: updatedInstructor, classroom: updatedClassroom, days: updatedDays, startDate: updatedStartDate, endDate: updatedEndDate, exam: updatedIsExam, hospitalityType: updatedHospitalityType, hospitalityCount: updatedHospitalityCount }; }
+            
+            await saveToFirebase();
+            closeEditModal();
+            showNotification('اطلاعات کلاس با موفقیت به‌روزرسانی شد!');
+        });
+        
+        clearScheduleBtn.addEventListener('click', async () => {
+            if (confirm('آیا از پاک کردن تمام برنامه اطمینان دارید؟ این عمل قابل بازگشت نیست.')) {
+                allCourses = [];
+                await saveToFirebase();
+                showNotification('تمامی برنامه پاک شد!', 'warning');
+            }
+        });
+
+        // بقیه توابع که نیازی به تغییر نداشتند
+        async function saveToGoogleSheets(courseData) { const scriptURL = 'https://script.google.com/macros/s/AKfycbxTX_hmqCDvmNkKSUvB-M0H4mmEuezyeGs4kewGUelxYh9TYwgxQ4sz2S9cmzCKYZOUsg/exec'; try { const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(courseData), headers: { 'Content-Type': 'application/json' }}); const result = await response.json(); console.log('Success:', result); showNotification('اطلاعات در گوگل شیت ذخیره شد!'); return result; } catch (error) { console.error('Error:', error); showNotification('خطا در ذخیره اطلاعات در گوگل شیت!', 'error'); throw error; } }
+        async function exportAllToSheets() { if (allCourses.length === 0) { showNotification('هیچ داده‌ای برای ارسال وجود ندارد!', 'warning'); return; } showNotification('در حال ارسال اطلاعات به گوگل شیت...', 'warning'); try { let successCount = 0; let errorCount = 0; for (const course of allCourses) { try { await saveToGoogleSheets({ code: course.code, name: course.name, method: courseMethod.value, duration: course.duration, instructor: course.instructor, classroom: course.classroom, days: course.days.join(', '), startDate: course.startDate, endDate: course.endDate, exam: course.exam ? 'بله' : 'خیر', hospitalityType: course.hospitalityType, hospitalityCount: course.hospitalityCount, category: course.category, timestamp: new Date().toLocaleString('fa-IR') }); successCount++; } catch (error) { errorCount++; console.error(`Error exporting course ${course.code}:`, error); } } showNotification(`ارسال اطلاعات تکمیل شد! ${successCount} مورد موفق، ${errorCount} مورد ناموفق`); } catch (error) { console.error('Export error:', error); showNotification('خطا در ارسال اطلاعات!', 'error'); } }
+        function calculateWeekDates(startDate, endDate) { const start = parseJalaliDate(startDate); const end = parseJalaliDate(endDate); if (!start || !end) { return null; } const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه']; const weekDates = {}; for (let i = 0; i < 7; i++) { const currentDate = addDaysToJalali(start, i); if (compareJalaliDates(currentDate, end) > 0) { break; } weekDates[days[i]] = formatJalaliDate(currentDate); } return weekDates; }
+        function parseJalaliDate(dateString) { const parts = dateString.split('/'); if (parts.length !== 3) return null; const year = parseInt(parts[0]); const month = parseInt(parts[1]); const day = parseInt(parts[2]); if (isNaN(year) || isNaN(month) || isNaN(day)) return null; return { year, month, day }; }
+        function compareJalaliDates(date1, date2) { if (date1.year !== date2.year) return date1.year - date2.year; if (date1.month !== date2.month) return date1.month - date2.month; return date1.day - date2.day; }
+        function addDaysToJalali(date, days) { let newDay = date.day + days; let newMonth = date.month; let newYear = date.year; const monthDays = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29]; if (isLeapYearJalali(newYear)) { monthDays[11] = 30; } while (newDay > monthDays[newMonth - 1]) { newDay -= monthDays[newMonth - 1]; newMonth++; if (newMonth > 12) { newMonth = 1; newYear++; if (isLeapYearJalali(newYear)) { monthDays[11] = 30; } else { monthDays[11] = 29; } } } return { year: newYear, month: newMonth, day: newDay }; }
+        function isLeapYearJalali(year) { return ((((year + 12) % 33) % 4) === 1); }
+        function formatJalaliDate(date) { return `${date.year}/${date.month.toString().padStart(2, '0')}/${date.day.toString().padStart(2, '0')}`; }
+        function updateWeekDisplay() { if (Object.keys(currentWeekDates).length === 0) { currentWeekDisplay.textContent = 'هفته مشخص نشده'; weekTitle.textContent = 'برنامه هفتگی'; return; } const startDate = weekStartDate.value; const endDate = weekEndDate.value; if (startDate && endDate) { currentWeekDisplay.textContent = `هفته از ${startDate} تا ${endDate}`; weekTitle.textContent = `هفته از ${startDate} تا ${endDate}`; } }
+        function updateScheduleTable() { while (scheduleTable.children.length > 9) { scheduleTable.removeChild(scheduleTable.lastChild); } const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه']; const locations = ['201', '202', '203', 'talar-khayyam', 'seminar-hafez', 'hospitality', 'exam', 'outside']; days.forEach(day => { const date = currentWeekDates[day] || ''; const isHoliday = date && holidays.includes(date); const dayHeader = document.createElement('div'); dayHeader.className = `day-header ${isHoliday ? 'holiday' : ''}`; dayHeader.innerHTML = `<div class="day-name">${day}</div><div class="day-date">${date}</div>`; scheduleTable.appendChild(dayHeader); locations.forEach(location => { const cell = document.createElement('div'); cell.className = 'schedule-cell empty'; cell.id = `cell-${getDayId(day)}-${location}`; cell.addEventListener('dragover', handleDragOver); cell.addEventListener('dragleave', handleDragLeave); cell.addEventListener('drop', handleDrop); scheduleTable.appendChild(cell); }); }); addCoursesToSchedule(); initializeDragAndDrop(); }
+        function addCoursesToSchedule() { if (Object.keys(currentWeekDates).length === 0) return; const weekCourses = allCourses.filter(course => { const courseStart = course.startDate; const courseEnd = course.endDate; for (const day in currentWeekDates) { const date = currentWeekDates[day]; if (date && date >= courseStart && date <= courseEnd && course.days.includes(day)) { return true; } } return false; }); weekCourses.forEach(course => { addClassToSchedule(course.id, course.code, course.name, course.instructor, course.classroom, course.days, course.startDate, course.endDate, course.color, course.category, course.exam, course.hospitalityType, course.hospitalityCount); }); }
+        function displayCourses(filter = '') { courseList.innerHTML = ''; const searchTerm = filter.trim().toLowerCase(); let filteredCourses = defaultCourses; const selectedCategory = categoryFilter.value; if (selectedCategory) { filteredCourses = filteredCourses.filter(course => course.category === selectedCategory); } if (searchTerm) { filteredCourses = filteredCourses.filter(course => course.code.includes(searchTerm) || course.name.toLowerCase().includes(searchTerm) || course.method.toLowerCase().includes(searchTerm) || course.startDate.includes(searchTerm) || course.endDate.includes(searchTerm) || course.duration.includes(searchTerm) || course.category.toLowerCase().includes(searchTerm)); } if (filteredCourses.length === 0) { const noResult = document.createElement('div'); noResult.className = 'course-option'; noResult.textContent = 'نتیجه‌ای یافت نشد'; courseList.appendChild(noResult); } else { filteredCourses.forEach(course => { const courseOption = document.createElement('div'); courseOption.className = 'course-option'; courseOption.innerHTML = `<div class="course-code">کد: ${course.code}</div><div class="course-title">${course.name}</div><div class="course-duration">مدت: ${course.duration} ساعت - روش: ${course.method}</div><div class="course-dates">${course.startDate} تا ${course.endDate}</div><div class="course-category">${course.category}</div>`; courseOption.addEventListener('click', () => { courseCode.value = course.code; courseName.value = course.name; courseMethod.value = course.method; courseDuration.value = course.duration; startDateInput.value = course.startDate; endDateInput.value = course.endDate; courseList.style.display = 'none'; }); courseList.appendChild(courseOption); }); } courseList.style.display = 'block'; }
+        courseSearch.addEventListener('input', () => { if (courseSearch.value.trim() !== '') { displayCourses(courseSearch.value); } else { courseList.style.display = 'none'; } });
+        categoryFilter.addEventListener('change', () => { if (courseSearch.value.trim() !== '') { displayCourses(courseSearch.value); } else { displayCourses(); } });
+        document.addEventListener('click', (e) => { if (!courseSearch.contains(e.target) && !courseList.contains(e.target) && !categoryFilter.contains(e.target)) { courseList.style.display = 'none'; } });
+        function updateWeekFromInputs() { const startDate = weekStartDate.value; const endDate = weekEndDate.value; if (startDate && endDate) { currentWeekDates = calculateWeekDates(startDate, endDate); if (currentWeekDates) { updateWeekDisplay(); updateScheduleTable(); } else { showNotification('تاریخ‌های وارد شده معتبر نیستند.', 'error'); } } }
+        weekStartDate.addEventListener('change', updateWeekFromInputs);
+        weekEndDate.addEventListener('change', updateWeekFromInputs);
+        prevWeekBtn.addEventListener('click', () => { const startDate = parseJalaliDate(weekStartDate.value); const endDate = parseJalaliDate(weekEndDate.value); if (!startDate || !endDate) { showNotification('لطفاً ابتدا تاریخ هفته را تنظیم کنید.', 'error'); return; } const newStartDate = addDaysToJalali(startDate, -7); const newEndDate = addDaysToJalali(endDate, -7); weekStartDate.value = formatJalaliDate(newStartDate); weekEndDate.value = formatJalaliDate(newEndDate); updateWeekFromInputs(); });
+        nextWeekBtn.addEventListener('click', () => { const startDate = parseJalaliDate(weekStartDate.value); const endDate = parseJalaliDate(weekEndDate.value); if (!startDate || !endDate) { showNotification('لطفاً ابتدا تاریخ هفته را تنظیم کنید.', 'error'); return; } const newStartDate = addDaysToJalali(startDate, 7); const newEndDate = addDaysToJalali(endDate, 7); weekStartDate.value = formatJalaliDate(newStartDate); weekEndDate.value = formatJalaliDate(newEndDate); updateWeekFromInputs(); });
+        function getDayId(day) { const dayMap = { 'شنبه': 'sat', 'یکشنبه': 'sun', 'دوشنبه': 'mon', 'سه‌شنبه': 'tue', 'چهارشنبه': 'wed', 'پنجشنبه': 'thu', 'جمعه': 'fri' }; return dayMap[day] || day; }
+        function adjustColor(color, amount) { return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2)); }
+        function showNotification(message, type = 'success', duration = 3000) { notificationText.textContent = message; notification.className = 'notification'; if (notification.timeoutId) { clearTimeout(notification.timeoutId); } if (type === 'error') { notification.classList.add('error'); notification.querySelector('i').className = 'fas fa-exclamation-circle'; } else if (type === 'warning') { notification.classList.add('warning'); notification.querySelector('i').className = 'fas fa-exclamation-triangle'; } else { notification.querySelector('i').className = 'fas fa-check-circle'; } notification.classList.add('show'); notification.timeoutId = setTimeout(() => { notification.classList.remove('show'); }, duration); }
+        function resetForm() { courseCode.value = ''; courseName.value = ''; courseMethod.value = ''; courseDuration.value = ''; instructorName.value = ''; startDateInput.value = ''; endDateInput.value = ''; isExam.checked = false; hospitalityType.value = ''; hospitalityCount.value = ''; const dayCheckboxes = [document.getElementById('saturday'), document.getElementById('sunday'), document.getElementById('monday'), document.getElementById('tuesday'), document.getElementById('wednesday'), document.getElementById('thursday'), document.getElementById('friday')]; dayCheckboxes.forEach(checkbox => { checkbox.checked = false; }); courseSearch.value = ''; categoryFilter.value = ''; courseList.style.display = 'none'; }
+        function openEditModal(course) { currentEditingCourse = course; editCourseName.value = course.name; editInstructorName.value = course.instructor; editClassroom.value = course.classroom; editStartDate.value = course.startDate; editEndDate.value = course.endDate; editIsExam.checked = course.exam; editHospitalityType.value = course.hospitalityType || ''; editHospitalityCount.value = course.hospitalityCount || ''; const dayCheckboxes = { 'شنبه': document.getElementById('editSaturday'), 'یکشنبه': document.getElementById('editSunday'), 'دوشنبه': document.getElementById('editMonday'), 'سه‌شنبه': document.getElementById('editTuesday'), 'چهارشنبه': document.getElementById('editWednesday'), 'پنجشنبه': document.getElementById('editThursday'), 'جمعه': document.getElementById('editFriday') }; Object.values(dayCheckboxes).forEach(checkbox => { checkbox.checked = false; }); course.days.forEach(day => { if (dayCheckboxes[day]) { dayCheckboxes[day].checked = true; } }); editModal.style.display = 'flex'; }
+        function closeEditModal() { editModal.style.display = 'none'; currentEditingCourse = null; }
+        printScheduleBtn.addEventListener('click', () => { weekTitle.style.display = 'block'; window.print(); setTimeout(() => { weekTitle.style.display = 'none'; }, 100); showNotification('برنامه با موفقیت چاپ شد!'); });
+        resetFormBtn.addEventListener('click', resetForm);
+        saveScheduleBtn.addEventListener('click', saveToFirebase);
+        exportToSheetsBtn.addEventListener('click', exportAllToSheets);
+        function updateStats() { const totalCourses = allCourses.length; const totalHours = allCourses.reduce((sum, course) => sum + parseInt(course.duration || 0), 0); const examCount = allCourses.filter(course => course.exam).length; const dayCounts = { 'شنبه': 0, 'یکشنبه': 0, 'دوشنبه': 0, 'سه‌شنبه': 0, 'چهارشنبه': 0, 'پنجشنبه': 0, 'جمعه': 0 }; allCourses.forEach(course => { course.days.forEach(day => { dayCounts[day]++; }); }); const busyDays = Object.values(dayCounts).filter(count => count > 0).length; totalCoursesEl.textContent = totalCourses; totalHoursEl.textContent = totalHours; examCountEl.textContent = examCount; busyDaysEl.textContent = busyDays; }
+        function handleDragOver(e) { e.preventDefault(); this.classList.add('drag-over'); }
+        function handleDragLeave() { this.classList.remove('drag-over'); }
+        async function handleDrop(e) { e.preventDefault(); this.classList.remove('drag-over'); const courseId = e.dataTransfer.getData('text/plain'); const courseItem = document.querySelector(`[data-course-id="${courseId}"]`); if (courseItem && !this.contains(courseItem)) { this.appendChild(courseItem); showNotification('کلاس (در ظاهر) جابجا شد! برای ذخیره تغییرات اصلی، از دکمه ویرایش استفاده کنید.'); } }
+        function initializeDragAndDrop() { const courseItems = document.querySelectorAll('.course-item'); courseItems.forEach(item => { initializeDragAndDropForItem(item); }); }
+        function initializeDragAndDropForItem(item) { item.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', item.dataset.courseId); item.classList.add('dragging'); }); item.addEventListener('dragend', () => { item.classList.remove('dragging'); }); }
+        closeModalBtn.addEventListener('click', closeEditModal);
+        cancelEditBtn.addEventListener('click', closeEditModal);
+        window.addEventListener('click', (e) => { if (e.target === editModal) { closeEditModal(); } });
+        document.addEventListener('DOMContentLoaded', () => { displayCourses(); weekStartDate.value = '1404/07/01'; weekEndDate.value = '1404/07/07'; updateWeekFromInputs(); });
+    </script>
+</body>
+</html>
